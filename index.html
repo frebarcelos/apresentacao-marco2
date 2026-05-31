@@ -137,12 +137,8 @@ function bul(arr){
 }
 
 const R={
-cover(s){return`<div class="slide cover">
-  <div class="ctitle">${s.title}</div>
-  <div class="csub">${s.subtitle}</div>
-  <div class="cextra">${s.extra}</div>
-  <table><thead><tr><th>Dev</th><th>Módulo</th></tr></thead>
-  <tbody>${s.team.map(t=>`<tr><td><span class="dbadge">${t.dev}</span></td><td class="mono">${t.module}</td></tr>`).join('')}</tbody></table>
+cover(s){return`<div class="slide closing">
+  <div class="closing-title">${s.title}</div>
 </div>`;},
 
 problem(s){return`<div class="slide">
@@ -171,8 +167,6 @@ architecture(s){return`<div class="slide">
 'strategy-practice'(s){return`<div class="slide">
   <h2 class="stitle">${s.title}</h2>
   <ol class="steps">${s.steps.map(t=>`<li>${t}</li>`).join('')}</ol>
-  <table style="margin-top:14px"><thead><tr><th>Dev</th><th>Módulo</th></tr></thead>
-  <tbody>${s.devs.map(d=>`<tr><td><span class="dbadge">${d.dev}</span></td><td class="mono">${d.module}</td></tr>`).join('')}</tbody></table>
 </div>`;},
 
 'table-slide'(s){return`<div class="slide">
@@ -221,11 +215,49 @@ results(s){return`<div class="slide">
 closing(s){return`<div class="slide closing">
   <div class="closing-title">${s.title}</div>
   <div class="closing-quote">"${s.quote}"</div>
-  <div class="closing-repo">${s.repo}</div>
 </div>`;}
 };
 
-const SLIDES=[{"id":1,"type":"cover","title":"GitHub PR Analyzer","subtitle":"Paradigma Funcional + LLMs","extra":"AL0337 · UNIPAMPA · v7.0.0 · Entrega 01/06/2026","team":[{"dev":"dev1","module":"io/ — Ingestão lazy"},{"dev":"dev2","module":"transforms/ — Funções puras"},{"dev":"dev3","module":"llm/ — Classificação"},{"dev":"dev4","module":"cache/ pipeline/"},{"dev":"dev5","module":"ui/ — Dashboard"}]},{"id":2,"type":"problem","title":"O Problema","questions":["📦 Que tipo de projeto é esse?","🔧 Qual a natureza de cada PR?","📝 A descrição é clara?"]},{"id":3,"type":"architecture","title":"A Solução","diagram":"  Dataset CSV/JSON\n       │\n       ▼\n  io/          leitura lazy — sem carregar tudo na RAM\n       │\n       ▼\n  transforms/  filter · map · reduce puros\n       │\n       ▼\n  pipeline/    compose() orquestra tudo\n       │\n       ├──▶  cache/   SHA-256 + SQLite\n       │\n       └──▶  llm/     Groq ou Ollama\n       │\n       ▼\n  ui/          Dashboard Streamlit"},{"id":4,"type":"ai-strategy","title":"Estratégia: Guardrails Primeiro","answer":"Cada dev usa a IA que quiser — os hooks garantem o padrão.","steps":["CLAUDE.md define arquitetura + regras FP001–FP006","50 tasks criadas antes da Sprint 1","✓ Pre-commit hooks julgam o resultado — independente da IA"]},{"id":5,"type":"dev-code","title":"dev1 — Ingestão Lazy","module":"io/","mission":"milhões de PRs · zero RAM extra","code":"def read_prs(path: Path) -> Generator[PRRecord, None, None]:\n    with open(path, encoding=\"utf-8\") as f:\n        yield from (\n            _parse_row(row)\n            for row in csv.DictReader(f)\n            if _is_valid(row)\n        )","bullets":["Um registro em memória por vez"]},{"id":6,"type":"strategy-practice","title":"Como Funcionou na Prática","steps":["Enunciado completo → CLAUDE.md gerado","50 tasks definidas antes da Sprint 1","Cada dev escolheu sua IA"],"devs":[{"dev":"dev1","module":"io/"},{"dev":"dev2","module":"transforms/"},{"dev":"dev3","module":"llm/"},{"dev":"dev4","module":"cache/ pipeline/"},{"dev":"dev5","module":"ui/"}]},{"id":7,"type":"dev-code","title":"dev2 — Transformações Puras","module":"transforms/","mission":"zero for · zero while · zero .append()","code":"def filter_by_state(state: str) -> Callable[[PRRecord], bool]:\n    return lambda pr: pr.state == state.lower().strip()\n\ndef count_by_language(prs: tuple[PRRecord, ...]) -> dict[str, int]:\n    return reduce(\n        lambda acc, pr: acc | {pr.language: acc.get(pr.language, 0) + 1},\n        prs, {}\n    )","bullets":["Heurísticas eliminam 10–30% das chamadas ao LLM"]},{"id":8,"type":"dev-code","title":"dev2 — Property-Based Testing","module":"transforms/","mission":"Hypothesis gera centenas de inputs aleatórios","code":"@given(st.lists(st.from_type(PRRecord)))\ndef test_count_never_loses_prs(prs: list[PRRecord]) -> None:\n    counts = count_by_language(tuple(prs))\n    assert sum(counts.values()) == len(prs)","bullets":["Cobertura ~100% incluindo edge cases"]},{"id":9,"type":"table-slide","title":"dev3 — 4 Classificações por PR","headers":["Dimensão","Valores"],"rows":[["Tipo de projeto","biblioteca · web · CLI · infra"],["Natureza","bug fix · feature · refatoração · docs"],["Clareza","insuficiente · básica · boa · excelente"],["Complexidade ⭐","low · medium · high  (sem LLM)"]]},{"id":10,"type":"performance","title":"dev3 — 5h → 12 minutos","problem":"2.000 PRs sequencialmente = ~5 horas.","headers":["O que mudou","Ganho"],"rows":[["asyncio.gather","2–4× throughput"],["Heurísticas antes do LLM","−30% chamadas"],["Cache por repositório","−33% tokens"]],"result":"~12 min na 1ª execução · instantâneo nas seguintes"},{"id":11,"type":"dev-code","title":"dev4 — Cache + Pipeline","module":"cache/ + pipeline/","mission":"nunca classificar o mesmo PR duas vezes","code":"def make_cache_key(*args: str) -> str:\n    return hashlib.sha256(\"\\x00\".join(args).encode()).hexdigest()\n\ndef compose(*fns: Callable) -> Callable:\n    return reduce(lambda f, g: lambda x: g(f(x)), fns, lambda x: x)","bullets":["SQLite WAL · thread-safe · sobrevive ao Docker rebuild"]},{"id":12,"type":"guardrails","title":"dev4 — Os Guardrails","intro":"Código que viole o paradigma nunca chega ao repositório.","code":"# Bloqueia no commit:\n# ast.For / ast.While em transforms/ ou pipeline/\n# .append() .update() .pop()\n# open() fora de io/ ou ui/","sections":[{"title":"Entrada ⭐ (Gift)","body":"sanitize() + validate_pr() — PRs corrompidos rejeitados antes do LLM."},{"title":"Push","body":"pytest no Docker · cobertura < 80% bloqueia o merge."}]},{"id":13,"type":"dashboard","title":"dev5 — Dashboard","module":"ui/ — Streamlit","features":[{"name":"Upload","desc":"CSV · JSON · archives até 11 GB"},{"name":"Escala","desc":"500 / 2k / 10k / 50k PRs"},{"name":"Backend","desc":"Groq ☁️ ou Ollama 💻"},{"name":"complexity ⭐","desc":"low / medium / high por PR"},{"name":"Export","desc":"CSV ou JSON enriquecido"}],"claudinho":"/claudinho merge concluído, cobertura em 88%","claudinho_resp":"Galera, 88%! 🎉 Sprint final em 4 dias — bora! 💪  — Claudinho 🤖"},{"id":14,"type":"results","title":"Resultados","metrics":[{"label":"Cobertura geral","value":"89%"},{"label":"transforms/ pipeline/","value":"~100%"},{"label":"2.000 PRs (1ª vez)","value":"~12 min"},{"label":"2.000 PRs (cache)","value":"instantâneo"},{"label":"Hooks ativos","value":"10"},{"label":"Sprints entregues","value":"6 + gift-merge"}]},{"id":15,"type":"next-steps","title":"Próximos Passos","pending":["Benchmark automático de modelos (LLM-08)","Model routing adaptativo (LLM-11)","Testes end-to-end com dataset completo"],"repo":"github.com/frebarcelos/marco-2-rp3"},{"id":16,"type":"closing","title":"Obrigado!","quote":"Aprender a pensar funcionalmente, testar antes de implementar e trabalhar com IA sem perder o controle do código.","repo":"github.com/frebarcelos/marco-2-rp3"}];
+const SLIDES=[{"id":1,"type":"cover","title":"GitHub PR Analyzer"},{"id":2,"type":"problem","title":"O Problema","questions":["📦 Que tipo de projeto é esse?","🔧 Qual a natureza de cada PR?","📝 A descrição é clara?"]},{"id":3,"type":"architecture","title":"A Solução","diagram":"  Dataset CSV/JSON
+       │
+       ▼
+  io/          leitura lazy — sem carregar tudo na RAM
+       │
+       ▼
+  transforms/  filter · map · reduce puros
+       │
+       ▼
+  pipeline/    compose() orquestra tudo
+       │
+       ├──▶  cache/   SHA-256 + SQLite
+       │
+       └──▶  llm/     Groq ou Ollama
+       │
+       ▼
+  ui/          Dashboard Streamlit"},{"id":4,"type":"ai-strategy","title":"Estratégia: Guardrails Primeiro","answer":"Cada dev usa a IA que quiser — os hooks garantem o padrão.","steps":["CLAUDE.md define arquitetura + regras FP001–FP006","50 tasks criadas antes da Sprint 1","✓ Pre-commit hooks julgam o resultado — independente da IA"]},{"id":5,"type":"dev-code","title":"Ingestão Lazy","module":"io/","mission":"milhões de PRs · zero RAM extra","code":"def read_prs(path: Path) -> Generator[PRRecord, None, None]:
+    with open(path, encoding=\"utf-8\") as f:
+        yield from (
+            _parse_row(row)
+            for row in csv.DictReader(f)
+            if _is_valid(row)
+        )","bullets":["Um registro em memória por vez"]},{"id":6,"type":"strategy-practice","title":"Como Funcionou na Prática","steps":["Enunciado completo → CLAUDE.md gerado","50 tasks definidas antes da Sprint 1","Cada dev escolheu sua IA"]},{"id":7,"type":"dev-code","title":"Transformações Funcionais Puras","module":"transforms/","mission":"zero for · zero while · zero .append()","code":"def filter_by_state(state: str) -> Callable[[PRRecord], bool]:
+    return lambda pr: pr.state == state.lower().strip()
+
+def count_by_language(prs: tuple[PRRecord, ...]) -> dict[str, int]:
+    return reduce(
+        lambda acc, pr: acc | {pr.language: acc.get(pr.language, 0) + 1},
+        prs, {}
+    )","bullets":["Heurísticas eliminam 10–30% das chamadas ao LLM"]},{"id":8,"type":"dev-code","title":"Property-Based Testing","module":"transforms/","mission":"Hypothesis gera centenas de inputs aleatórios","code":"@given(st.lists(st.from_type(PRRecord)))
+def test_count_never_loses_prs(prs: list[PRRecord]) -> None:
+    counts = count_by_language(tuple(prs))
+    assert sum(counts.values()) == len(prs)","bullets":["Cobertura ~100% incluindo edge cases"]},{"id":9,"type":"table-slide","title":"4 Classificações por PR","headers":["Dimensão","Valores"],"rows":[["Tipo de projeto","biblioteca · web · CLI · infra"],["Natureza","bug fix · feature · refatoração · docs"],["Clareza","insuficiente · básica · boa · excelente"],["Complexidade ⭐","low · medium · high  (sem LLM)"]]},{"id":10,"type":"performance","title":"5h → 12 minutos","problem":"2.000 PRs sequencialmente = ~5 horas.","headers":["O que mudou","Ganho"],"rows":[["asyncio.gather","2–4× throughput"],["Heurísticas antes do LLM","−30% chamadas"],["Cache por repositório","−33% tokens"]],"result":"~12 min na 1ª execução · instantâneo nas seguintes"},{"id":11,"type":"dev-code","title":"Cache + Pipeline","module":"cache/ + pipeline/","mission":"nunca classificar o mesmo PR duas vezes","code":"def make_cache_key(*args: str) -> str:
+    return hashlib.sha256(\"\x00\".join(args).encode()).hexdigest()
+
+def compose(*fns: Callable) -> Callable:
+    return reduce(lambda f, g: lambda x: g(f(x)), fns, lambda x: x)","bullets":["SQLite WAL · thread-safe · sobrevive ao Docker rebuild"]},{"id":12,"type":"guardrails","title":"Os Guardrails","intro":"Código que viole o paradigma nunca chega ao repositório.","code":"# Bloqueia no commit:
+# ast.For / ast.While em transforms/ ou pipeline/
+# .append() .update() .pop()
+# open() fora de io/ ou ui/","sections":[{"title":"Entrada ⭐ (Gift)","body":"sanitize() + validate_pr() — PRs corrompidos rejeitados antes do LLM."},{"title":"Push","body":"pytest no Docker · cobertura < 80% bloqueia o merge."}]},{"id":13,"type":"dashboard","title":"Dashboard Streamlit","module":"ui/","features":[{"name":"Upload","desc":"CSV · JSON · archives até 11 GB"},{"name":"Escala","desc":"500 / 2k / 10k / 50k PRs"},{"name":"Backend","desc":"Groq ☁️ ou Ollama 💻"},{"name":"complexity ⭐","desc":"low / medium / high por PR"},{"name":"Export","desc":"CSV ou JSON enriquecido"}],"claudinho":"/claudinho merge concluído, cobertura em 88%","claudinho_resp":"Galera, 88%! 🎉 Sprint final em 4 dias — bora! 💪  — Claudinho 🤖"},{"id":14,"type":"results","title":"Resultados","metrics":[{"label":"Cobertura geral","value":"89%"},{"label":"transforms/ pipeline/","value":"~100%"},{"label":"2.000 PRs (1ª vez)","value":"~12 min"},{"label":"2.000 PRs (cache)","value":"instantâneo"},{"label":"Hooks ativos","value":"10"},{"label":"Sprints entregues","value":"6 + gift"}]},{"id":15,"type":"next-steps","title":"Próximos Passos","pending":["Benchmark automático de modelos","Model routing adaptativo","Testes end-to-end com dataset completo"],"repo":"github.com/frebarcelos/marco-2-rp3"},{"id":16,"type":"closing","title":"Obrigado!","quote":"Aprender a pensar funcionalmente, testar antes de implementar e trabalhar com IA sem perder o controle do código."}];
 
 let cur=0;
 

@@ -1,16 +1,7 @@
 [
   {
     "id": 1, "type": "cover",
-    "title": "GitHub PR Analyzer",
-    "subtitle": "Paradigma Funcional + LLMs",
-    "extra": "AL0337 · UNIPAMPA · v7.0.0 · Entrega 01/06/2026",
-    "team": [
-      { "dev": "dev1", "module": "io/ — Ingestão lazy"          },
-      { "dev": "dev2", "module": "transforms/ — Funções puras"  },
-      { "dev": "dev3", "module": "llm/ — Classificação"         },
-      { "dev": "dev4", "module": "cache/ pipeline/"             },
-      { "dev": "dev5", "module": "ui/ — Dashboard"              }
-    ]
+    "title": "GitHub PR Analyzer"
   },
   {
     "id": 2, "type": "problem",
@@ -38,7 +29,7 @@
   },
   {
     "id": 5, "type": "dev-code",
-    "title": "dev1 — Ingestão Lazy",
+    "title": "Ingestão Lazy",
     "module": "io/",
     "mission": "milhões de PRs · zero RAM extra",
     "code": "def read_prs(path: Path) -> Generator[PRRecord, None, None]:\n    with open(path, encoding=\"utf-8\") as f:\n        yield from (\n            _parse_row(row)\n            for row in csv.DictReader(f)\n            if _is_valid(row)\n        )",
@@ -51,18 +42,11 @@
       "Enunciado completo → CLAUDE.md gerado",
       "50 tasks definidas antes da Sprint 1",
       "Cada dev escolheu sua IA"
-    ],
-    "devs": [
-      { "dev": "dev1", "module": "io/"              },
-      { "dev": "dev2", "module": "transforms/"      },
-      { "dev": "dev3", "module": "llm/"             },
-      { "dev": "dev4", "module": "cache/ pipeline/" },
-      { "dev": "dev5", "module": "ui/"              }
     ]
   },
   {
     "id": 7, "type": "dev-code",
-    "title": "dev2 — Transformações Puras",
+    "title": "Transformações Funcionais Puras",
     "module": "transforms/",
     "mission": "zero for · zero while · zero .append()",
     "code": "def filter_by_state(state: str) -> Callable[[PRRecord], bool]:\n    return lambda pr: pr.state == state.lower().strip()\n\ndef count_by_language(prs: tuple[PRRecord, ...]) -> dict[str, int]:\n    return reduce(\n        lambda acc, pr: acc | {pr.language: acc.get(pr.language, 0) + 1},\n        prs, {}\n    )",
@@ -70,7 +54,7 @@
   },
   {
     "id": 8, "type": "dev-code",
-    "title": "dev2 — Property-Based Testing",
+    "title": "Property-Based Testing",
     "module": "transforms/",
     "mission": "Hypothesis gera centenas de inputs aleatórios",
     "code": "@given(st.lists(st.from_type(PRRecord)))\ndef test_count_never_loses_prs(prs: list[PRRecord]) -> None:\n    counts = count_by_language(tuple(prs))\n    assert sum(counts.values()) == len(prs)",
@@ -78,7 +62,7 @@
   },
   {
     "id": 9, "type": "table-slide",
-    "title": "dev3 — 4 Classificações por PR",
+    "title": "4 Classificações por PR",
     "headers": ["Dimensão", "Valores"],
     "rows": [
       ["Tipo de projeto",   "biblioteca · web · CLI · infra"],
@@ -89,7 +73,7 @@
   },
   {
     "id": 10, "type": "performance",
-    "title": "dev3 — 5h → 12 minutos",
+    "title": "5h → 12 minutos",
     "problem": "2.000 PRs sequencialmente = ~5 horas.",
     "headers": ["O que mudou", "Ganho"],
     "rows": [
@@ -101,7 +85,7 @@
   },
   {
     "id": 11, "type": "dev-code",
-    "title": "dev4 — Cache + Pipeline",
+    "title": "Cache + Pipeline",
     "module": "cache/ + pipeline/",
     "mission": "nunca classificar o mesmo PR duas vezes",
     "code": "def make_cache_key(*args: str) -> str:\n    return hashlib.sha256(\"\\x00\".join(args).encode()).hexdigest()\n\ndef compose(*fns: Callable) -> Callable:\n    return reduce(lambda f, g: lambda x: g(f(x)), fns, lambda x: x)",
@@ -109,8 +93,8 @@
   },
   {
     "id": 12, "type": "guardrails",
-    "title": "dev4 — Os Guardrails",
-    "intro": "Código gerado por IA que viole o paradigma nunca chega ao repositório.",
+    "title": "Os Guardrails",
+    "intro": "Código que viole o paradigma nunca chega ao repositório.",
     "code": "# Bloqueia no commit:\n# ast.For / ast.While em transforms/ ou pipeline/\n# .append() .update() .pop()\n# open() fora de io/ ou ui/",
     "sections": [
       { "title": "Entrada ⭐ (Gift)", "body": "sanitize() + validate_pr() — PRs corrompidos rejeitados antes do LLM." },
@@ -119,14 +103,14 @@
   },
   {
     "id": 13, "type": "dashboard",
-    "title": "dev5 — Dashboard",
-    "module": "ui/ — Streamlit",
+    "title": "Dashboard Streamlit",
+    "module": "ui/",
     "features": [
-      { "name": "Upload",       "desc": "CSV · JSON · archives até 11 GB"           },
-      { "name": "Escala",       "desc": "500 / 2k / 10k / 50k PRs"                  },
-      { "name": "Backend",      "desc": "Groq ☁️ ou Ollama 💻"                      },
-      { "name": "complexity ⭐", "desc": "low / medium / high por PR"               },
-      { "name": "Export",       "desc": "CSV ou JSON enriquecido"                   }
+      { "name": "Upload",       "desc": "CSV · JSON · archives até 11 GB"  },
+      { "name": "Escala",       "desc": "500 / 2k / 10k / 50k PRs"         },
+      { "name": "Backend",      "desc": "Groq ☁️ ou Ollama 💻"             },
+      { "name": "complexity ⭐", "desc": "low / medium / high por PR"      },
+      { "name": "Export",       "desc": "CSV ou JSON enriquecido"           }
     ],
     "claudinho": "/claudinho merge concluído, cobertura em 88%",
     "claudinho_resp": "Galera, 88%! 🎉 Sprint final em 4 dias — bora! 💪  — Claudinho 🤖"
@@ -135,20 +119,20 @@
     "id": 14, "type": "results",
     "title": "Resultados",
     "metrics": [
-      { "label": "Cobertura geral",        "value": "89%" },
-      { "label": "transforms/ pipeline/",  "value": "~100%" },
-      { "label": "2.000 PRs (1ª vez)",     "value": "~12 min" },
+      { "label": "Cobertura geral",        "value": "89%"         },
+      { "label": "transforms/ pipeline/",  "value": "~100%"       },
+      { "label": "2.000 PRs (1ª vez)",     "value": "~12 min"     },
       { "label": "2.000 PRs (cache)",      "value": "instantâneo" },
-      { "label": "Hooks ativos",           "value": "10" },
-      { "label": "Sprints entregues",      "value": "6 + gift-merge" }
+      { "label": "Hooks ativos",           "value": "10"          },
+      { "label": "Sprints entregues",      "value": "6 + gift"    }
     ]
   },
   {
     "id": 15, "type": "next-steps",
     "title": "Próximos Passos",
     "pending": [
-      "Benchmark automático de modelos (LLM-08)",
-      "Model routing adaptativo (LLM-11)",
+      "Benchmark automático de modelos",
+      "Model routing adaptativo",
       "Testes end-to-end com dataset completo"
     ],
     "repo": "github.com/frebarcelos/marco-2-rp3"
@@ -156,7 +140,6 @@
   {
     "id": 16, "type": "closing",
     "title": "Obrigado!",
-    "quote": "Aprender a pensar funcionalmente, testar antes de implementar e trabalhar com IA sem perder o controle do código.",
-    "repo": "github.com/frebarcelos/marco-2-rp3"
+    "quote": "Aprender a pensar funcionalmente, testar antes de implementar e trabalhar com IA sem perder o controle do código."
   }
 ]
