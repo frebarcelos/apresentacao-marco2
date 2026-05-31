@@ -1,23 +1,27 @@
 # Roteiro de Apresentação — GitHub PR Analyzer
 
-**Tempo limite:** 10–12 minutos · **Meta:** 10 min (deixar 2 min de margem para imprevistos)  
+**Tempo limite:** 10–12 minutos · **Meta:** ~10 min  
 **Data:** 01/06/2026 · AL0337 · UNIPAMPA  
-**Demo de código obrigatória** — encaixada no slide 5 (Bernardo) e slide 13 (Diogo)
+**Demos obrigatórias:** slide 5 (Bernardo — código ao vivo) · slide 7 (Pedro — pytest) · slide 12 (Diogo — dashboard)
 
-> **Regra:** não ler o slide. Falar sobre o projeto, o slide é só o apoio visual.
+> **Regra:** não ler o slide. Falar sobre o projeto; o slide é só apoio visual.
 
 ---
 
 ## Distribuição por membro
 
-| Quem      | Slides        | Tempo  |
-|-----------|---------------|--------|
-| Frederico | 1 · 2 · 3 · 4 | ~2 min |
-| Bernardo  | 5 · 6         | ~2 min |
-| Pedro     | 7 · 8         | ~2 min |
-| Dean      | 9 · 10        | ~2 min |
-| Diogo     | 11 · 12 · 13  | ~2 min |
-| Todos     | 14 · 15 · 16  | ~1 min |
+| Quem      | Slides             | Tempo   |
+|-----------|--------------------|---------|
+| Frederico | 1 · 2              | ~1 min  |
+| Bernardo  | 3 · 4 · 5          | ~2 min  |
+| Pedro     | 6 · 7              | ~1:40   |
+| Dean      | 8 · 9              | ~1:30   |
+| Frederico | 10 · 11            | ~1:20   |
+| Diogo     | 12 · 13 · 14       | ~2 min  |
+| Frederico | 15                 | ~0:10   |
+| **Total** |                    | **~10 min** |
+
+> Frederico fala em dois blocos (abertura + módulos dele). Todos os outros falam em bloco contínuo.
 
 ---
 
@@ -28,158 +32,164 @@
 ### Slide 1 — Capa ⏱ 0:20 (acum. 0:20)
 **Quem:** Frederico
 
-- Apresentar o grupo e o projeto pelo nome.
-- *"Desenvolvemos o GitHub PR Analyzer: um analisador de Pull Requests usando programação funcional e LLMs. Cada membro foi responsável por um módulo específico do sistema."*
+- *"Bom dia. Somos o grupo do GitHub PR Analyzer — um analisador de Pull Requests com programação funcional e LLMs. Cinco módulos, cinco devs, uma entrega."*
 
 ---
 
 ### Slide 2 — O Problema ⏱ 0:40 (acum. 1:00)
 **Quem:** Frederico
 
-- Contextualizar o problema antes de mostrar as perguntas.
-- *"Repositórios públicos acumulam milhares de PRs. Analisar isso manualmente é inviável — o dataset que usamos, do Kaggle, tem milhões de entradas."*
-- Apontar as 3 perguntas: tipo, natureza, clareza.
-- *"Nenhuma ferramenta respondia as três de forma integrada."*
+- *"O problema é escala. Repositórios no GitHub acumulam milhares de PRs — o dataset que usamos tem milhões de entradas."*
+- Apontar as 3 perguntas do slide: *"Nenhuma ferramenta respondia as três de forma integrada. Foi o que construímos."*
+- Passar para Bernardo.
 
 ---
 
 ### Slide 3 — A Solução ⏱ 0:40 (acum. 1:40)
-**Quem:** Frederico
+**Quem:** Bernardo
 
-- Explicar o fluxo de cima pra baixo.
-- *"A entrada é um CSV ou JSON. O dado passa por io/, que lê de forma lazy sem carregar tudo na RAM. As transforms/ aplicam funções puras. O pipeline/ orquestra tudo via composição de funções. Cache evita re-classificar o mesmo PR. O LLM classifica. A UI exibe."*
-- Destacar: *"A regra central era: transforms/ e pipeline/ não podem ter I/O nem loops imperativos."*
+- Percorrer o diagrama de cima pra baixo: *"A entrada é um CSV ou JSON. O io/ lê de forma lazy. As transforms/ aplicam funções puras. O pipeline/ orquestra via composição de funções. O cache evita re-classificar o mesmo PR. O LLM classifica. A UI exibe."*
+- *"A regra central era: transforms/ e pipeline/ zero I/O, zero loops imperativos."*
 
 ---
 
 ### Slide 4 — Estratégia: Guardrails Primeiro ⏱ 0:40 (acum. 2:20)
-**Quem:** Frederico
+**Quem:** Bernardo
 
-- *"A pergunta que nos guiou foi: como cada dev usa a IA que quiser sem quebrar o projeto?"*
-- Explicar o CLAUDE.md: *"Criamos um arquivo de regras que qualquer IA lê antes de gerar código — arquitetura, imports proibidos, regras FP001 a FP006."*
-- *"Criamos 50 tasks antes da Sprint 1. Cada dev sabia exatamente o que entregar."*
-- *"Os hooks de pré-commit julgavam o resultado — independente de qual IA foi usada."*
+- *"O Frederico criou um CLAUDE.md que qualquer IA lia antes de gerar código. Tinha a arquitetura, os imports proibidos, as regras FP001 a FP006."*
+- *"Antes da Sprint 1 já tínhamos 50 tasks definidas. Cada um sabia exatamente o que entregar."*
+- *"Os pre-commit hooks julgavam o resultado independente de qual IA foi usada — ruff, mypy, check-paradigm AST, cobertura."*
 
 ---
 
 ### Slide 5 — Ingestão Lazy ⏱ 1:00 (acum. 3:20)
 **Quem:** Bernardo  
-**⚡ DEMO DE CÓDIGO — abrir o arquivo `io/csv_reader.py` no terminal**
+**⚡ DEMO — abrir `src/pr_analyzer/io/csv_reader.py` no terminal/IDE**
 
-- *"Meu módulo é o io/. A responsabilidade é ler datasets de milhões de linhas sem explodir a RAM."*
-- Mostrar o `read_prs` no código real: *"O `yield from` faz com que só um registro exista em memória por vez. O PRRecord é imutável desde a leitura."*
-- *"Rodei com o dataset de 50 mil PRs e o consumo de RAM ficou flat."*
-
----
-
-### Slide 6 — Como Funcionou na Prática ⏱ 0:40 (acum. 4:00)
-**Quem:** Bernardo
-
-- *"Na prática, o Frederico passou o enunciado completo pro Claude Code, que gerou o CLAUDE.md com a arquitetura toda já definida."*
-- *"A gente recebeu as tasks antes da Sprint 1 — era só implementar, não descobrir o que fazer."*
-- *"Cada um escolheu a IA que queria. O que importava era passar nos hooks."*
+- *"Meu módulo foi o io/. O desafio era ler milhões de linhas sem explodir a RAM."*
+- Mostrar o `read_prs` no código real: *"O `yield from` garante que só um registro existe em memória por vez. O PRRecord é um NamedTuple — imutável desde a leitura."*
+- *"Rodei com 50 mil PRs. O consumo de RAM ficou flat, não cresceu."*
 
 ---
 
-### Slide 7 — Transformações Funcionais Puras ⏱ 0:50 (acum. 4:50)
+### Slide 6 — Transformações Funcionais Puras ⏱ 0:50 (acum. 4:10)
 **Quem:** Pedro
 
-- *"Meu módulo, o transforms/, tem uma restrição dura: zero for, zero while, zero append. Qualquer violação bloqueia o commit."*
-- Explicar `filter_by_state`: *"A função retorna um predicado — não o resultado. Isso permite compor com outras funções."*
-- Explicar `count_by_language`: *"Usa reduce com dict merge. Sem mutar nada."*
-- *"Adicionei heurísticas que classificam PRs óbvios por palavras-chave antes de chamar o LLM — isso elimina 10 a 30% das chamadas."*
+- *"Meu módulo, o transforms/, tem uma restrição dura: zero for, zero while, zero append — qualquer violação bloqueia o commit."*
+- Explicar `filter_by_state`: *"Retorna um predicado, não o resultado. Isso permite compor com outras funções sem quebrar pureza."*
+- Explicar `count_by_language`: *"Usa reduce com dict merge, sem mutar nada."*
+- *"Adicionei heurísticas que classificam PRs por palavras-chave antes do LLM — elimina 10 a 30% das chamadas."*
 
 ---
 
-### Slide 8 — Property-Based Testing ⏱ 0:50 (acum. 5:40)
-**Quem:** Pedro
+### Slide 7 — Property-Based Testing ⏱ 0:50 (acum. 5:00)
+**Quem:** Pedro  
+**⚡ DEMO — rodar `pytest src/tests/transforms/ -v` no terminal**
 
-- *"Além dos testes unitários, usei o Hypothesis para property-based testing."*
-- Explicar o teste na tela: *"Esse teste garante que a soma dos counts sempre iguala o total de PRs — independente dos dados de entrada. O Hypothesis gera centenas de inputs aleatórios automaticamente, incluindo unicode bizarro."*
-- *"Cobertura final em transforms/ ficou em quase 100%, incluindo edge cases que eu nunca teria pensado manualmente."*
+- *"Além dos testes unitários, usei Hypothesis para property-based testing."*
+- Mostrar o teste: *"Esse teste garante que a soma dos counts sempre iguala o total de PRs, com qualquer input. O Hypothesis gera centenas de entradas aleatórias — incluindo unicode bizarro."*
+- Ao rodar o pytest: *"Cobertura quase 100%, incluindo edge cases que nunca teria pensado manualmente."*
 
 ---
 
-### Slide 9 — 4 Classificações por PR ⏱ 0:40 (acum. 6:20)
+### Slide 8 — 4 Classificações por PR ⏱ 0:40 (acum. 5:40)
 **Quem:** Dean
 
 - *"Meu módulo, o llm/, classifica cada PR em 4 dimensões."*
-- Percorrer a tabela: tipo de projeto, natureza, clareza, e a complexidade de revisão que veio da integração com o Gift.
-- *"A complexidade é calculada por heurística — sem chamar o LLM — usando tamanho do diff e arquivos alterados."*
-- *"O sistema detecta automaticamente se usar Groq na nuvem ou Ollama local."*
+- Percorrer a tabela: tipo, natureza, clareza, e a complexidade de revisão que veio da integração com o Gift.
+- *"A complexidade é calculada por heurística pura — sem LLM — usando tamanho do diff e arquivos alterados."*
+- *"O sistema detecta automaticamente se vai usar Groq na nuvem ou Ollama local."*
 
 ---
 
-### Slide 10 — 5h → 12 minutos ⏱ 0:50 (acum. 7:10)
+### Slide 9 — 5h → 12 minutos ⏱ 0:50 (acum. 6:30)
 **Quem:** Dean
 
-- *"O problema inicial era sério: classificar 2 mil PRs sequencialmente levava 5 horas."*
-- Percorrer a tabela rapidamente: *"asyncio.gather paralelizou o I/O. O batch adaptativo evita retries caros. As heurísticas cortaram 30% das chamadas. O cache de tipo por repositório cortou um terço dos tokens."*
-- *"Com tudo isso junto, ficou em 12 minutos na primeira execução e instantâneo nas seguintes pelo cache SQLite."*
+- *"O problema real: classificar 2 mil PRs sequencialmente levava 5 horas. Inviável."*
+- Percorrer a tabela: *"asyncio.gather paralelizou o I/O, 2 a 4 vezes de throughput. As heurísticas cortaram 30% das chamadas. Cache por repositório cortou um terço dos tokens."*
+- *"Com tudo junto: 12 minutos na primeira execução, instantâneo nas seguintes pelo cache SQLite."*
 
 ---
 
-### Slide 11 — Cache + Pipeline ⏱ 0:40 (acum. 7:50)
-**Quem:** Diogo
+### Slide 10 — Cache + Pipeline ⏱ 0:40 (acum. 7:10)
+**Quem:** Frederico
 
-- *"O cache usa SHA-256 como chave determinística — mesmos argumentos, mesmo hash, resultado já está no SQLite."*
-- *"O pipeline é uma composição de funções via reduce. Sem um único loop explícito."*
-- *"O SQLite roda em WAL mode, é thread-safe e sobrevive ao Docker rebuild."*
-
----
-
-### Slide 12 — Os Guardrails ⏱ 0:40 (acum. 8:30)
-**Quem:** Diogo
-
-- *"O check_paradigm é um script que analisa a AST do código antes de cada commit. Se encontrar um for ou while nos módulos puros, bloqueia."*
-- *"Da integração com o Gift veio o sanitize e o validate_pr — PRs sem título e sem repo são rejeitados antes de consumir um token do LLM."*
-- *"A cada push, o pytest roda no Docker. Cobertura abaixo de 80% bloqueia o merge."*
+- *"Meu módulo, o cache + pipeline. A regra do cache é simples: nunca classificar o mesmo PR duas vezes."*
+- *"A chave usa SHA-256 com separador nulo — evita colisões entre argumentos."*
+- *"O pipeline compõe funções via reduce. Sem um único loop explícito — qualquer nova etapa é só acrescentar à composição."*
 
 ---
 
-### Slide 13 — Dashboard Streamlit ⏱ 1:00 (acum. 9:30)
+### Slide 11 — Os Guardrails ⏱ 0:40 (acum. 7:50)
+**Quem:** Frederico
+
+- *"O check_paradigm analisa a AST antes de cada commit. Se encontrar for, while ou append nos módulos puros, bloqueia — independente de qual IA gerou o código."*
+- *"Da integração com o Gift veio o sanitize e o validate_pr — PRs corrompidos são rejeitados antes de consumir token."*
+- *"A cada push, pytest roda no Docker. Cobertura abaixo de 80% bloqueia o merge."*
+
+---
+
+### Slide 12 — Dashboard Streamlit ⏱ 1:10 (acum. 9:00)
 **Quem:** Diogo  
-**⚡ DEMO — abrir o dashboard no browser: `http://localhost:8501`**
+**⚡ DEMO — dashboard pré-carregado em `http://localhost:8501`**
 
-- *"O dashboard é o ponto de entrada do sistema para o usuário final."*
-- Mostrar ao vivo: upload, seletor de escala, seletor de backend, tabela com a coluna complexity.
-- *"Esse Claudinho aqui não foi à toa — ele lia os commits reais do git e gerava resumos de sprint estilo WhatsApp. Mantinha o time alinhado sem reuniões."*
+- *"Meu módulo é a UI. O dashboard é onde tudo isso se torna navegável."*
+- Mostrar ao vivo: escala de PRs, seletor de backend, tabela com coluna complexity, gráficos.
+- *"O Claudinho é um comando que lia os commits reais do git e gerava resumos de sprint — mantinha o time alinhado sem reunião de status."*
 
 ---
 
-### Slide 14 — Resultados ⏱ 0:20 (acum. 9:50)
+### Slide 13 — Resultados ⏱ 0:25 (acum. 9:25)
+**Quem:** Diogo
+
+- *"89% de cobertura geral, 100% nos módulos puros. 12 minutos onde eram 5 horas. 10 hooks ativos. 6 sprints entregues mais a integração com o Gift."*
+
+---
+
+### Slide 14 — Próximos Passos ⏱ 0:20 (acum. 9:45)
+**Quem:** Diogo
+
+- *"Os itens abertos são benchmark automático de modelos e model routing adaptativo. Testes end-to-end com o dataset completo."*
+
+---
+
+### Slide 15 — Obrigado! ⏱ 0:15 (acum. 10:00)
 **Quem:** Frederico
 
-- Passar rapidamente pela tabela: *"89% de cobertura geral, 100% nos módulos puros, 12 minutos de processamento onde eram 5 horas, 10 hooks ativos, 6 sprints entregues."*
+- Todos visíveis. *"Obrigado. Ficamos à disposição para as perguntas."*
 
 ---
 
-### Slide 15 — Próximos Passos ⏱ 0:15 (acum. 10:05)
-**Quem:** Frederico
+## Preparação para perguntas do professor
 
-- *"Ainda temos o benchmark automático de modelos e o model routing adaptativo pendentes. São os últimos itens abertos."*
+> O período de Q&A vem logo após. Todos devem estar prontos para responder sobre **seu próprio módulo**.
 
----
-
-### Slide 16 — Obrigado ⏱ 0:10 (acum. 10:15)
-**Quem:** Todos
-
-- Todos visíveis. Frederico: *"Obrigado. Ficamos à disposição para perguntas."*
+| Pergunta provável | Quem responde | Resposta-chave |
+|---|---|---|
+| *"Por que programação funcional para esse problema?"* | Frederico | Testabilidade: funções puras não têm estado, cada função é testável isoladamente. Composição: pipeline construído por composição, sem acoplamento. |
+| *"Como vocês garantem que o LLM classifica corretamente?"* | Dean | Não garantimos acurácia 100% — o LLM é probabilístico. As heurísticas cobrem os casos óbvios. A clareza da descrição é validada por critérios léxicos, não só pelo LLM. |
+| *"O que são as regras FP001 a FP006 exatamente?"* | Frederico | FP001: proibido `for`. FP002: proibido `while`. FP003: proibido `x[i]=y`. FP004: proibido `.append()/.update()/.pop()`. FP005: proibido `open()` fora de io/ ou ui/. FP006: sem estado global mutável. |
+| *"O que acontece se o Ollama cair durante a classificação?"* | Dean | Retry com backoff exponencial em `client.py`. Se falhar todas as tentativas, o PR vai para fallback com classificação vazia e é logado. |
+| *"Por que separador nulo no make_cache_key?"* | Frederico | Para evitar colisões: `("a", "bc")` e `("ab", "c")` geram a mesma string concatenada, mas com `\x00` como separador ficam distintas. |
+| *"A cobertura de 89% inclui os testes do LLM com chamadas reais?"* | Dean/Pedro | Não — o llm/ usa mocks nos testes. A cobertura real de chamadas ao LLM foi validada manualmente com datasets menores. |
+| *"O Claudinho é parte do escopo do projeto?"* | Diogo | É uma feature da UI — um comando do Claude Code que integra com a GitHub API para gerar relatórios de sprint. Está dentro do módulo ui/. |
 
 ---
 
 ## Checklist pré-apresentação
 
-- [ ] Dashboard rodando: `make docker-run` (ou `streamlit run src/pr_analyzer/ui/app.py`)
-- [ ] `io/csv_reader.py` aberto no terminal/IDE para Bernardo mostrar
-- [ ] Arquivo `index.html` aberto no browser em tela cheia (F11)
-- [ ] Todos sabem em qual slide entram
-- [ ] Ensaio cronometrado feito ao menos uma vez
+- [ ] Dashboard **pré-carregado** com dataset pequeno (500 PRs) rodando em `localhost:8501`
+- [ ] `src/pr_analyzer/io/csv_reader.py` aberto no editor para Bernardo mostrar
+- [ ] Terminal com `pytest src/tests/transforms/ -v` pronto para Pedro rodar
+- [ ] `index.html` aberto no browser em **tela cheia (F11)**
+- [ ] Ensaio cronometrado feito ao menos uma vez (alvo: 9:30 para ter folga)
+- [ ] Todos sabem em qual slide entram e qual é a deixa de passagem
 
 ## Contingência
 
 | Problema | Ação |
-|----------|------|
-| Dashboard não sobe | Mostrar o código da UI no editor |
-| Tempo estourando | Slides 8 e 15 podem ser pulados |
-| Pergunta técnica difícil | "Posso detalhar melhor no período de perguntas" |
+|---|---|
+| Dashboard não sobe | Diogo mostra o código da UI no editor e descreve as features |
+| pytest demora muito | Pedro cancela após 10s e mostra a cobertura já gerada (`coverage report`) |
+| Tempo estourando | Slides 7 (Property Testing) e 14 (Próximos Passos) podem ser pulados |
+| Pergunta técnica fora do módulo | Redirecionar: *"Isso é o módulo do X, ele pode explicar melhor"* |
