@@ -25,8 +25,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 #progress-bar{height:5px;background:#e5e7eb;flex-shrink:0}
 #progress-fill{height:100%;background:var(--blue);transition:width .3s}
 
-#slide-area{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden}
-.slide{width:900px;flex-shrink:0;animation:fi .18s ease}
+#slide-area{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden}
+.slide{width:100%;font-size:min(2vw,3.4vh);animation:fi .18s ease}
 @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 #controls{display:flex;align-items:center;justify-content:center;gap:24px;padding:14px;border-top:2px solid #e5e7eb;background:var(--surf);flex-shrink:0}
@@ -261,18 +261,6 @@ def compose(*fns: Callable) -> Callable:
 
 let cur=0;
 
-function scaleSlide(){
-  const area=document.getElementById('slide-area');
-  const slide=area.querySelector('.slide');
-  if(!slide) return;
-  slide.style.zoom='1';
-  const availW=area.clientWidth-32;
-  const availH=area.clientHeight-32;
-  const nW=slide.offsetWidth;
-  const nH=slide.offsetHeight;
-  slide.style.zoom=String(Math.min(availW/nW, availH/nH));
-}
-
 function render(){
   const s=SLIDES[cur],fn=R[s.type];
   document.getElementById('slide-area').innerHTML=fn?fn(s):`<div class="slide"><h2 class="stitle">${s.title}</h2></div>`;
@@ -280,10 +268,7 @@ function render(){
   document.getElementById('progress-fill').style.width=`${((cur+1)/SLIDES.length)*100}%`;
   document.getElementById('bp').disabled=cur===0;
   document.getElementById('bn').disabled=cur===SLIDES.length-1;
-  scaleSlide();
 }
-
-window.addEventListener('resize', scaleSlide);
 document.getElementById('bp').onclick=()=>{if(cur>0){cur--;render();}};
 document.getElementById('bn').onclick=()=>{if(cur<SLIDES.length-1){cur++;render();}};
 document.addEventListener('keydown',e=>{
