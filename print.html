@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+@page{size:landscape;margin:0}
+:root{--bg:#ffffff;--surf:#f3f4f6;--border:#9ca3af;--text:#0d0d0d;--muted:#374151;--blue:#1d4ed8;--green:#15803d;--orange:#b45309;--purple:#6d28d9;--mono:'Courier New',monospace;--sans:Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{font-family:var(--sans);font-size:16px;line-height:1.45;color:var(--text);background:#fff}
+.page{width:100%;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:32px 56px;page-break-after:always;break-after:page;box-sizing:border-box}
+.page:last-child{page-break-after:avoid;break-after:avoid}
+.stitle{font-size:1.9em;font-weight:900;color:var(--blue);margin-bottom:22px;padding-bottom:10px;border-bottom:3px solid var(--blue);line-height:1.15}
+.smission{font-family:var(--mono);font-size:.75em;color:var(--muted);font-weight:600;margin-bottom:12px}
+.intro,.prob{color:var(--muted);font-weight:600;font-size:.88em;margin-bottom:12px}
+.cover{text-align:center;display:flex;flex-direction:column;align-items:center;gap:24px}
+.ctitle{font-size:3em;font-weight:900;color:var(--blue);line-height:1.1}
+.closing-quote{font-style:italic;color:var(--muted);max-width:620px;line-height:1.7;font-size:.9em;font-weight:500}
+table{width:100%;border-collapse:collapse;margin:12px 0}
+th{background:var(--blue);color:#fff;padding:9px 14px;text-align:left;font-size:.88em;font-weight:700}
+td{padding:9px 14px;border-bottom:2px solid #e5e7eb;font-size:.9em}
+tr:last-child td{border-bottom:none}
+.green{color:var(--green);font-weight:700}
+.mono{font-family:var(--mono);font-weight:600;color:var(--purple)}
+ul.b{list-style:none;margin:14px 0}
+ul.b li{padding:8px 0 8px 26px;position:relative;border-bottom:1px solid #e5e7eb;font-size:1em;font-weight:500}
+ul.b li:last-child{border-bottom:none}
+ul.b li::before{content:'▸';position:absolute;left:0;color:var(--blue);font-weight:900}
+ul.b li.ok::before{content:'✓';color:var(--green)}
+ul.b li code{font-family:var(--mono);color:var(--purple);background:#ede9fe;padding:1px 5px;border-radius:3px}
+ul.b li strong{color:var(--blue)}
+pre.code{background:#f8fafc;border:2px solid var(--border);border-radius:8px;padding:16px 20px;font-family:var(--mono);font-size:.72em;line-height:1.65;margin:12px 0}
+.kw{color:var(--purple);font-weight:700}
+.st{color:var(--green);font-weight:600}
+.cm{color:var(--muted);font-style:italic}
+.nm,.tp{color:var(--orange)}
+.lang{color:var(--border);font-size:.75em;font-weight:700;float:right}
+pre.arch{background:var(--surf);border:2px solid var(--border);border-radius:8px;padding:12px 18px;font-family:var(--mono);font-size:.65em;line-height:1.5;color:var(--text);font-weight:600}
+.result{color:var(--green);font-weight:700;margin-top:14px;font-size:.95em;padding:11px 16px;background:#f0fdf4;border-radius:8px;border-left:5px solid var(--green)}
+.gsec{margin-top:10px;background:var(--surf);border:2px solid #e5e7eb;border-left:5px solid var(--blue);border-radius:0 8px 8px 0;padding:10px 14px}
+.gsec-title{color:var(--blue);font-weight:700;font-size:.88em;margin-bottom:3px}
+.gsec-body{color:var(--muted);font-size:.82em;font-weight:500}
+.claudinho{margin-top:14px;background:#f0fdf4;border:2px solid var(--green);border-radius:8px;padding:12px 16px}
+.claudinho-cmd{font-family:var(--mono);color:var(--muted);font-size:.72em;margin-bottom:6px;font-weight:600}
+.claudinho-msg{font-size:.85em;line-height:1.6;color:var(--green);font-weight:700}
+.quote{background:var(--surf);border-left:6px solid var(--blue);padding:16px 20px;border-radius:0 8px 8px 0;margin:16px 0;font-size:1em;font-weight:600}
+</style>
+</head>
+<body>
+<div class="page"><div class="cover"><div class="ctitle">GitHub PR Analyzer</div></div></div>
+<div class="page"><h2 class="stitle">O Problema</h2><ul class="b"><li>📦 Que tipo de projeto é esse?</li><li>🔧 Qual a natureza de cada PR?</li><li>📝 A descrição é clara?</li></ul></div>
+<div class="page"><h2 class="stitle">A Solução</h2><pre class="arch">  Dataset CSV/JSON
+       │
+       ▼
+  io/          leitura lazy — sem carregar tudo na RAM
+       │
+       ▼
+  transforms/  filter · map · reduce puros
+       │
+       ▼
+  pipeline/    compose() orquestra tudo
+       │
+       ├──▶  cache/   SHA-256 + SQLite
+       │
+       └──▶  llm/     Groq ou Ollama
+       │
+       ▼
+  ui/          Dashboard Streamlit</pre></div>
+<div class="page"><h2 class="stitle">Estratégia: Guardrails Primeiro</h2><div class="quote">Cada dev usa a IA que quiser — os hooks garantem o padrão.</div><ul class="b"><li>CLAUDE.md define arquitetura + regras FP001–FP006</li><li>50 tasks criadas antes da Sprint 1</li><li  class="ok">✓ Pre-commit hooks julgam o resultado — independente da IA</li></ul></div>
+<div class="page"><h2 class="stitle">Ingestão Lazy</h2><p class="smission">io/ — milhões de PRs · zero RAM extra</p><pre class="code"><span class="lang">python</span><span class="kw">def</span> read_prs(path: Path) -&gt; Generator[PRRecord, <span class="kw">None</span>, <span class="kw">None</span>]:
+    <span class="kw">with</span> open(path, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+        <span class="kw">yield</span> <span class="kw">from</span> (
+            _parse_row(row)
+            <span class="kw">for</span> row <span class="kw">in</span> csv.DictReader(f)
+            <span class="kw">if</span> _is_valid(row)
+        )</pre><ul class="b"><li>Um registro em memória por vez</li></ul></div>
+<div class="page"><h2 class="stitle">4 Classificações por PR</h2><table><thead><tr><th>Dimensão</th><th>Valores</th></tr></thead><tbody><tr><td>Tipo de projeto</td><td class="green">biblioteca · web · CLI · infra</td></tr><tr><td>Natureza</td><td class="green">bug fix · feature · refatoração · docs</td></tr><tr><td>Clareza</td><td class="green">insuficiente · básica · boa · excelente</td></tr><tr><td>Complexidade ⭐</td><td class="green">low · medium · high  (sem LLM)</td></tr></tbody></table></div>
+<div class="page"><h2 class="stitle">5h → 12 minutos</h2><p class="prob">2.000 PRs sequencialmente = ~5 horas.</p><table><thead><tr><th>O que mudou</th><th>Ganho</th></tr></thead><tbody><tr><td>asyncio.gather</td><td class="green">2–4× throughput</td></tr><tr><td>Heurísticas antes do LLM</td><td class="green">−30% chamadas</td></tr><tr><td>Cache por repositório</td><td class="green">−33% tokens</td></tr></tbody></table><div class="result">✓ ~12 min na 1ª execução · instantâneo nas seguintes</div></div>
+<div class="page"><h2 class="stitle">Cache + Pipeline</h2><p class="smission">cache/ + pipeline/ — nunca classificar o mesmo PR duas vezes</p><pre class="code"><span class="lang">python</span><span class="kw">def</span> make_cache_key(*args: str) -&gt; str:
+    <span class="kw">return</span> hashlib.sha256(<span class="st">"\x00"</span>.join(args).encode()).hexdigest()
+
+<span class="kw">def</span> compose(*fns: Callable) -&gt; Callable:
+    <span class="kw">return</span> <span class="kw">reduce</span>(<span class="kw">lambda</span> f, g: <span class="kw">lambda</span> x: g(f(x)), fns, <span class="kw">lambda</span> x: x)</pre><ul class="b"><li>SQLite WAL · thread-safe · sobrevive ao Docker rebuild</li></ul></div>
+<div class="page"><h2 class="stitle">Os Guardrails</h2><p class="intro">Código que viole o paradigma nunca chega ao repositório.</p><pre class="code"><span class="cm"># Bloqueia no commit:</span>
+<span class="cm"># ast.For / ast.While em transforms/ ou pipeline/</span>
+<span class="cm"># .append() .update() .pop()</span>
+<span class="cm"># open() fora de io/ ou ui/</span></pre><div class="gsec"><div class="gsec-title">Entrada ⭐ (Gift)</div><div class="gsec-body">sanitize() + validate_pr() — PRs corrompidos rejeitados antes do LLM.</div></div><div class="gsec"><div class="gsec-title">Push</div><div class="gsec-body">pytest no Docker · cobertura < 80% bloqueia o merge.</div></div></div>
+<div class="page"><h2 class="stitle">Dashboard Streamlit</h2><table><thead><tr><th>Componente</th><th>Função</th></tr></thead><tbody><tr><td class="mono">Upload</td><td>CSV · JSON · archives até 11 GB</td></tr><tr><td class="mono">Escala</td><td>500 / 2k / 10k / 50k PRs</td></tr><tr><td class="mono">Backend</td><td>Groq ☁️ ou Ollama 💻</td></tr><tr><td class="mono">complexity ⭐</td><td>low / medium / high por PR</td></tr><tr><td class="mono">Export</td><td>CSV ou JSON enriquecido</td></tr></tbody></table><div class="claudinho"><div class="claudinho-cmd">💬 /claudinho merge concluído, cobertura em 88%</div><div class="claudinho-msg">Galera, 88%! 🎉 Sprint final em 4 dias — bora! 💪  — Claudinho 🤖</div></div></div>
+<div class="page"><h2 class="stitle">Resultados</h2><table><thead><tr><th>Métrica</th><th>Resultado</th></tr></thead><tbody><tr><td>Cobertura geral</td><td class="green">89%</td></tr><tr><td>transforms/ pipeline/</td><td class="green">~100%</td></tr><tr><td>2.000 PRs (1ª vez)</td><td class="green">~12 min</td></tr><tr><td>2.000 PRs (cache)</td><td class="green">instantâneo</td></tr><tr><td>Hooks ativos</td><td class="green">10</td></tr><tr><td>Sprints entregues</td><td class="green">6 + gift</td></tr></tbody></table></div>
+<div class="page"><h2 class="stitle">Próximos Passos</h2><ul class="b"><li>Benchmark automático de modelos</li><li>Model routing adaptativo</li><li>Testes end-to-end com dataset completo</li></ul></div>
+<div class="page"><div class="cover"><div class="ctitle">Obrigado!</div><div class="closing-quote">"Aprender a pensar funcionalmente, testar antes de implementar e trabalhar com IA sem perder o controle do código."</div></div></div>
+</body>
+</html>

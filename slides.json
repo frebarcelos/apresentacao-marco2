@@ -43,28 +43,6 @@
     ]
   },
   {
-    "id": 6,
-    "type": "dev-code",
-    "title": "Transformações Funcionais Puras",
-    "module": "transforms/",
-    "mission": "zero for · zero while · zero .append()",
-    "code": "def filter_by_state(state: str) -> Callable[[PRRecord], bool]:\n    return lambda pr: pr.state == state.lower().strip()\n\ndef count_by_language(prs: tuple[PRRecord, ...]) -> dict[str, int]:\n    return reduce(\n        lambda acc, pr: acc | {pr.language: acc.get(pr.language, 0) + 1},\n        prs, {}\n    )",
-    "bullets": [
-      "Heurísticas eliminam 10–30% das chamadas ao LLM"
-    ]
-  },
-  {
-    "id": 7,
-    "type": "dev-code",
-    "title": "Property-Based Testing",
-    "module": "transforms/",
-    "mission": "Hypothesis gera centenas de inputs aleatórios",
-    "code": "@given(st.lists(st.from_type(PRRecord)))\ndef test_count_never_loses_prs(prs: list[PRRecord]) -> None:\n    counts = count_by_language(tuple(prs))\n    assert sum(counts.values()) == len(prs)",
-    "bullets": [
-      "Cobertura ~100% incluindo edge cases"
-    ]
-  },
-  {
     "id": 8,
     "type": "table-slide",
     "title": "4 Classificações por PR",
@@ -213,8 +191,7 @@
       "Benchmark automático de modelos",
       "Model routing adaptativo",
       "Testes end-to-end com dataset completo"
-    ],
-    "repo": "github.com/frebarcelos/marco-2-rp3"
+    ]
   },
   {
     "id": 15,
